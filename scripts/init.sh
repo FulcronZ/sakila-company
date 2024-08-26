@@ -6,7 +6,7 @@ mkdir -p compose/app-db/
 for file_name in pagila-schema.sql pagila-data.sql LICENSE.txt
 do
     curl \
-        -s -o compose/app-db/$file_name \
+        -s -o compose/app-db/docker-entrypoint-initdb.d/$file_name \
         https://raw.githubusercontent.com/devrimgunduz/pagila/$PAGILA_TAG/$file_name
 done
 echo ..done
