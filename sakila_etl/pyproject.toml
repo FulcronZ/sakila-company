@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "sakila-etl"
+version = "0.1.0"
+description = ""
+authors = ["Pipat Methavanitpong <3275368+FulcronZ@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{ include = "sakila_etl" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+dagster = "^1.7.16"
+dagster-webserver = "^1.7.16"
+dagster-embedded-elt = "^0.24.0"
+dlt = { extras = ["clickhouse"], version = "^0.5.3" }
+psycopg2-binary = "^2.9.9"
+dagster-dbt = "^0.24.1"
+dbt-clickhouse = "^1.8.1"
+dbt-core = "^1.8.5"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+shandy-sqlfmt = { extras = ["jinjafmt"], version = "^0.23.2" }
+isort = "^5.13.2"
+black = "^24.8.0"
+pylint = "^3.2.6"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.dagster]
+module_name = "sakila_etl"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+target-version = ["py310", "py311"]

@@ -1,0 +1,12 @@
+[sqlfluff]
+dialect = clickhouse
+exclude_rules = layout.indent, layout.cte_bracket, layout.select_targets, layout.spacing
+# set max_line_length to whatever you set in sqlfmt
+max_line_length = 88
+
+[sqlfluff:rules]
+capitalisation_policy = lower
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:convention.terminator]
+multiline_newline = True

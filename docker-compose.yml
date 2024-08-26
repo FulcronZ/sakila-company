@@ -1,0 +1,108 @@
+services:
+  app-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/app-db-password
+      POSTGRES_DB: pagila
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+      - ./compose/app-db/docker-entrypoint-initdb.d/pagila-schema.sql:/docker-entrypoint-initdb.d/1-pagila-schema.sql
+      - ./compose/app-db/docker-entrypoint-initdb.d/pagila-data.sql:/docker-entrypoint-initdb.d/2-pagila-data.sql
+    ports:
+      - 5432:5432
+    secrets:
+      - app-db-password
+
+  analytics-dwh:
+    image: clickhouse/clickhouse-server:24.6
+    environment:
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: 12345678
+    volumes:
+      - ./compose/analytics-dwh/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - analytics-dwh-data:/var/lib/clickhouse
+      - analytics-dwh-logs:/var/log/clickhouse-server
+    ports:
+      - 18123:8123
+      - 19000:9000
+
+  metabase-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: metabase
+      POSTGRES_PASSWORD_FILE: /run/secrets/metabase-db-password
+      POSTGRES_DB: metabase
+    volumes:
+      - metabase-db-data:/var/lib/postgresql/data
+    secrets:
+      - metabase-db-password
+
+  dagster:
+    build: ./sakila_etl
+    environment:
+      DBT_PROFILES_DIR: /run/secrets/dbt
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DRIVERNAME: "postgresql+psycopg2"
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__HOST: app-db
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PORT: 5432
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DATABASE: pagila
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__USERNAME: $DAGSTER_DB_USERNAME
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PASSWORD: $DAGSTER_DB_PASSWORD
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__HOST: analytics-dwh
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__DATABASE: raw_pagila
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__USERNAME: $DAGSTER_CLICKHOUSE_USERNAME
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__PASSWORD: $DAGSTER_CLICKHOUSE_PASSWORD
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__PORT: 9000
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__HTTP_PORT: 8123
+      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__SECURE: 0
+      DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
+      DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
+    volumes:
+      - dagster-history-data:/opt/dagster/history
+      - dagster-storage-data:/opt/dagster/storage
+      - bucket-data:/opt/dagster/data
+    ports:
+      - 3000:3000
+    secrets:
+      - source: dagster-dbt-profiles
+        target: /run/secrets/dbt/profiles.yml
+
+  metabase:
+    image: metabase/metabase:v0.50.21
+    volumes:
+      - /dev/urandom:/dev/random:ro
+      - ./compose/metabase/plugins/clickhouse.jar:/plugins/clickhouse.jar:ro
+    ports:
+      - 3100:3000
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS_FILE: /run/secrets/metabase-db-password
+      MB_DB_HOST: metabase-db
+    secrets:
+      - metabase-db-password
+    healthcheck:
+      test: curl --fail -I http://localhost:3000/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bucket-data:
+  app-db-data:
+  analytics-dwh-data:
+  analytics-dwh-logs:
+  metabase-db-data:
+  dagster-history-data:
+  dagster-storage-data:
+
+secrets:
+  app-db-password:
+    file: ./compose/app-db/secrets/db_password.txt
+  metabase-db-password:
+    file: ./compose/metabase-db/secrets/db_password.txt
+  dagster-dbt-profiles:
+    file: ./compose/dagster/secrets/dbt_profiles.yml

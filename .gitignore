@@ -1,0 +1,7 @@
+.vscode
+
+compose/**/secrets/
+compose/.env*
+compose/**/LICENSE*
+compose/app-db/docker-entrypoint-initdb.d/pagila-*.sql
+compose/metabase/plugins/clickhouse.jar

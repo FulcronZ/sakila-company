@@ -1,0 +1,329 @@
+version: 2
+
+models:
+  - name: base_pagila__address
+    columns:
+      - name: address_id
+        tests:
+          - not_null
+          - unique
+      - name: address
+      - name: address2
+      - name: district
+      - name: city_id
+        tests:
+          - relationships:
+              to: ref('base_pagila__city')
+              field: city_id
+      - name: postal_code
+      - name: phone
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: base_pagila__city
+    columns:
+      - name: city_id
+        tests:
+          - not_null
+          - unique
+      - name: city
+      - name: country_id
+        tests:
+          - relationships:
+              to: ref('base_pagila__country')
+              field: country_id
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: base_pagila__country
+    columns:
+      - name: country_id
+        tests:
+          - not_null
+          - unique
+      - name: country
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: base_pagila__film
+    columns:
+      - name: film_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+      - name: description
+      - name: language_id
+        tests:
+          - relationships:
+              to: ref('base_pagila__language')
+              field: language_id
+      - name: original_language_id
+        tests:
+          - relationships:
+              to: ref('base_pagila__language')
+              field: language_id
+      - name: rental_duration
+      - name: rental_rate
+      - name: length
+      - name: replacement_cost
+      - name: rating
+      - name: last_update
+      - name: release_year
+      - name: fulltext
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: base_pagila__language
+    columns:
+      - name: language_id
+        tests:
+          - not_null
+          - unique
+      - name: name
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__address
+    columns:
+      - name: address_id
+        tests:
+          - not_null
+          - unique
+      - name: country
+      - name: city
+      - name: address
+      - name: address2
+      - name: district
+      - name: postal_code
+      - name: phone
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__actor
+    columns:
+      - name: actor_id
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+      - name: last_name
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: base_pagila__category
+    columns:
+      - name: category_id
+        tests:
+          - not_null
+          - unique
+      - name: name
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__customer
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      - name: store_id
+      - name: first_name
+      - name: last_name
+      - name: email
+      - name: address_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__address')
+              field: address_id
+      - name: activebool
+      - name: create_date
+      - name: last_update
+      - name: active
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__film__special_features
+    columns:
+      - name: value
+      - name: _dlt_id
+      - name: _dlt_parent_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__film')
+              field: _dlt_id
+      - name: _dlt_list_idx
+
+  - name: stg_pagila__film_actor
+    columns:
+      - name: actor_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__actor')
+              field: actor_id
+      - name: film_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__film')
+              field: film_id
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__film_category
+    columns:
+      - name: film_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__film')
+              field: film_id
+      - name: category
+        tests:
+          - relationships:
+              to: ref('base_pagila__category')
+              field: name
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__film
+    columns:
+      - name: film_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+      - name: description
+      - name: language
+      - name: original_language
+      - name: rental_duration
+      - name: rental_rate
+      - name: length
+      - name: replacement_cost
+      - name: rating
+      - name: last_update
+      - name: release_year
+      - name: fulltext
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__inventory
+    columns:
+      - name: inventory_id
+        tests:
+          - not_null
+          - unique
+      - name: film_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__film')
+              field: film_id
+      - name: store_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__store')
+              field: store_id
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__payment
+    columns:
+      - name: payment_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__customer')
+              field: customer_id
+      - name: staff_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__staff')
+              field: staff_id
+      - name: rental_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__rental')
+              field: rental_id
+      - name: amount
+      - name: payment_date
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__rental
+    columns:
+      - name: rental_id
+        tests:
+          - not_null
+          - unique
+      - name: rental_date
+      - name: inventory_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__inventory')
+              field: inventory_id
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__customer')
+              field: customer_id
+      - name: return_date
+      - name: staff_id
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__staff
+    columns:
+      - name: staff_id
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+      - name: last_name
+      - name: address_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__address')
+              field: address_id
+      - name: email
+      - name: store_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__store')
+              field: store_id
+      - name: active
+      - name: username
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id
+
+  - name: stg_pagila__store
+    columns:
+      - name: store_id
+        tests:
+          - not_null
+          - unique
+      - name: manager_staff_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__staff')
+              field: staff_id
+      - name: address_id
+        tests:
+          - relationships:
+              to: ref('stg_pagila__address')
+              field: address_id
+      - name: last_update
+      - name: _dlt_load_id
+      - name: _dlt_id

@@ -1,0 +1,374 @@
+version: 2
+
+sources:
+  - name: pagila
+    database: raw_pagila
+    tables:
+      - name: actor
+        identifier: raw_pagila___actor
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "actor"]
+        columns:
+          - name: actor_id
+            tests:
+              - not_null
+              - unique
+          - name: first_name
+          - name: last_name
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: address
+        identifier: raw_pagila___address
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "address"]
+        columns:
+          - name: address_id
+            tests:
+              - not_null
+              - unique
+          - name: address
+          - name: address2
+          - name: district
+          - name: city_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'city')
+                  field: city_id
+          - name: postal_code
+          - name: phone
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: category
+        identifier: raw_pagila___category
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "category"]
+        columns:
+          - name: category_id
+            tests:
+              - not_null
+              - unique
+          - name: name
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: city
+        identifier: raw_pagila___city
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "city"]
+        columns:
+          - name: city_id
+            tests:
+              - not_null
+              - unique
+          - name: city
+          - name: country_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'country')
+                  field: country_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: country
+        identifier: raw_pagila___country
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "country"]
+        columns:
+          - name: country_id
+            tests:
+              - not_null
+              - unique
+          - name: country
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: customer
+        identifier: raw_pagila___customer
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "customer"]
+        columns:
+          - name: customer_id
+            tests:
+              - not_null
+              - unique
+          - name: store_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'store')
+                  field: store_id
+          - name: first_name
+          - name: last_name
+          - name: email
+          - name: address_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'address')
+                  field: address_id
+          - name: activebool
+          - name: create_date
+          - name: last_update
+          - name: active
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: film_actor
+        identifier: raw_pagila___film_actor
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "film_actor"]
+        tests:
+          - unique:
+              column_name: "actor_id || '-' || film_id"
+        columns:
+          - name: actor_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'actor')
+                  field: actor_id
+          - name: film_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'film')
+                  field: film_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: film_category
+        identifier: raw_pagila___film_category
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "film_category"]
+        tests:
+          - unique:
+              column_name: "film_id || '-' || category_id"
+        columns:
+          - name: film_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'film')
+                  field: film_id
+          - name: category_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'category')
+                  field: category_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: film
+        identifier: raw_pagila___film
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "film"]
+        columns:
+          - name: film_id
+            tests:
+              - not_null
+              - unique
+          - name: title
+          - name: description
+          - name: language_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'language')
+                  field: language_id
+          - name: original_language_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'language')
+                  field: language_id
+          - name: rental_duration
+          - name: rental_rate
+          - name: length
+          - name: replacement_cost
+          - name: rating
+          - name: last_update
+          - name: release_year
+          - name: fulltext
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: film__special_features
+        identifier: raw_pagila___film__special_features
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "film__special_features"]
+        columns:
+          - name: value
+          - name: _dlt_id
+          - name: _dlt_parent_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'film')
+                  field: _dlt_id
+          - name: _dlt_list_idx
+
+      - name: inventory
+        identifier: raw_pagila___inventory
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "inventory"]
+        columns:
+          - name: inventory_id
+            tests:
+              - not_null
+              - unique
+          - name: film_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'film')
+                  field: film_id
+          - name: store_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'store')
+                  field: store_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: language
+        identifier: raw_pagila___language
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "language"]
+        columns:
+          - name: language_id
+            tests:
+              - not_null
+              - unique
+          - name: name
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: payment
+        identifier: raw_pagila___payment
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "payment"]
+        columns:
+          - name: payment_id
+            tests:
+              - not_null
+              - unique
+          - name: customer_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'customer')
+                  field: customer_id
+          - name: staff_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'staff')
+                  field: staff_id
+          - name: rental_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'rental')
+                  field: rental_id
+          - name: amount
+          - name: payment_date
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: rental
+        identifier: raw_pagila___rental
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "rental"]
+        columns:
+          - name: rental_id
+            tests:
+              - not_null
+              - unique
+          - name: rental_date
+          - name: inventory_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'inventory')
+                  field: inventory_id
+          - name: customer_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'customer')
+                  field: customer_id
+          - name: return_date
+          - name: staff_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'staff')
+                  field: staff_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: staff
+        identifier: raw_pagila___staff
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "staff"]
+        columns:
+          - name: staff_id
+            tests:
+              - not_null
+              - unique
+          - name: first_name
+          - name: last_name
+          - name: address_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'address')
+                  field: address_id
+          - name: email
+          - name: store_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'store')
+                  field: store_id
+          - name: active
+          - name: username
+          - name: password
+          - name: last_update
+          - name: picture
+          - name: _dlt_load_id
+          - name: _dlt_id
+
+      - name: store
+        identifier: raw_pagila___store
+        meta:
+          dagster:
+            asset_key: ["analytics_dwh", "raw", "store"]
+        columns:
+          - name: store_id
+            tests:
+              - not_null
+              - unique
+          - name: manager_staff_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'staff')
+                  field: staff_id
+          - name: address_id
+            tests:
+              - relationships:
+                  to: source('pagila', 'address')
+                  field: address_id
+          - name: last_update
+          - name: _dlt_load_id
+          - name: _dlt_id

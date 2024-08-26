@@ -1,0 +1,261 @@
+version: 2
+
+models:
+  - name: brd_film_actor
+    columns:
+      - name: bridge_key
+        tests:
+          - not_null
+          - unique
+      - name: film_key
+        tests:
+          - relationships:
+              to: ref('dim_film')
+              field: film_key
+      - name: actor_key
+        tests:
+          - relationships:
+              to: ref('dim_actor')
+              field: actor_key
+      - name: __etl_processed_at
+
+  - name: dim_actor
+    columns:
+      - name: actor_key
+        tests:
+          - not_null
+          - unique
+      - name: actor_id
+      - name: first_name
+      - name: last_name
+      - name: __etl_processed_at
+
+  - name: dim_customer
+    columns:
+      - name: customer_key
+        tests:
+          - not_null
+          - unique
+      - name: store_key
+        tests:
+          - relationships:
+              to: ref('dim_store')
+              field: store_key
+      - name: customer_id
+      - name: created_date
+      - name: country
+      - name: city
+      - name: district
+      - name: postal_code
+      - name: __etl_processed_at
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests:
+          - not_null
+          - unique
+      - name: full_date
+      - name: year
+      - name: quarter
+      - name: month
+      - name: day
+      - name: day_of_week
+      - name: is_weekend
+      - name: __etl_processed_at
+
+  - name: dim_film
+    columns:
+      - name: film_key
+        tests:
+          - not_null
+          - unique
+      - name: film_id
+      - name: title
+      - name: description
+      - name: release_year
+      - name: language
+      - name: original_language
+      - name: rental_duration
+      - name: rental_rate
+      - name: length
+      - name: replacement_cost
+      - name: rating
+      - name: genre_action
+      - name: genre_animation
+      - name: genre_children
+      - name: genre_classics
+      - name: genre_comedy
+      - name: genre_documentary
+      - name: genre_drama
+      - name: genre_family
+      - name: genre_foreign
+      - name: genre_games
+      - name: genre_horror
+      - name: genre_music
+      - name: genre_new
+      - name: genre_sci_fi
+      - name: genre_sports
+      - name: genre_travel
+      - name: feat_deleted_scenes
+      - name: feat_behind_the_scenes
+      - name: feat_trailers
+      - name: feat_commentairies
+      - name: __etl_processed_at
+
+  - name: dim_staff
+    columns:
+      - name: staff_key
+        tests:
+          - not_null
+          - unique
+      - name: store_key
+        tests:
+          - relationships:
+              to: ref('dim_store')
+              field: store_key
+      - name: staff_id
+      - name: is_manager
+      - name: country
+      - name: city
+      - name: district
+      - name: postal_code
+      - name: __etl_processed_at
+
+  - name: dim_store_inventory
+    columns:
+      - name: inventory_key
+        tests:
+          - not_null
+          - unique
+      - name: store_key
+        tests:
+          - relationships:
+              to: ref('dim_store')
+              field: store_key
+      - name: film_key
+      - name: inventory_id
+      - name: __etl_processed_at
+
+  - name: dim_store
+    columns:
+      - name: store_key
+        tests:
+          - not_null
+          - unique
+      - name: store_id
+      - name: country
+      - name: city
+      - name: district
+      - name: postal_code
+
+  - name: fct_film_rented
+    columns:
+      - name: fact_key
+        tests:
+          - not_null
+          - unique
+      - name: rent_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: return_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: pay_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: inventory_key
+        tests:
+          - relationships:
+              to: ref('dim_store_inventory')
+              field: inventory_key
+      - name: film_key
+        tests:
+          - relationships:
+              to: ref('dim_film')
+              field: film_key
+      - name: rent_store_key
+        tests:
+          - relationships:
+              to: ref('dim_store')
+              field: store_key
+      - name: rent_customer_key
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_key
+      - name: rent_staff_key
+        tests:
+          - relationships:
+              to: ref('dim_staff')
+              field: staff_key
+      - name: pay_customer_key
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_key
+      - name: pay_staff_key
+        tests:
+          - relationships:
+              to: ref('dim_staff')
+              field: staff_key
+      - name: rental_id
+      - name: rent_ts
+      - name: return_ts
+      - name: pay_ts
+      - name: pay_amount
+      - name: __etl_processed_at
+
+  - name: fct_other_payment
+    columns:
+      - name: fact_key
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: customer_key
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_key
+      - name: staff_key
+      - name: pay_id
+      - name: pay_amount
+      - name: __etl_processed_at
+
+  - name: fct_daily_customer_registered
+    columns:
+      - name: fact_key
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: store_key
+        tests:
+          - relationships:
+              to: ref('dim_store')
+              field: store_key
+      - name: country
+      - name: city
+      - name: district
+      - name: postal_code
+      - name: customers
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: __etl_processed_at
