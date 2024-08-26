@@ -14,6 +14,14 @@ $ docker compose --env-file compose/.env up
 The initialization script downloads required files and generates credential
 and environment files for every component.
 
+### Ports:
+
+- 3000 - Dagster
+- 3100 - Metabase
+- 5432 - App Database (Postgresql)
+- 18123 - Analytics Data Warehouse (Clickhouse HTTP)
+- 19000 - Analytics Data Warehouse (Clickhouse Native)
+
 ## Background
 
 The author had been working as a data engineer and the first data person
