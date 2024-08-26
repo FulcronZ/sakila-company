@@ -6,7 +6,7 @@ mkdir -p compose/app-db/
 for file_name in pagila-schema.sql pagila-data.sql LICENSE.txt
 do
     curl \
-        -s -o compose/app-db/docker-entrypoint-initdb.d/$file_name \
+        -s -L -o compose/app-db/docker-entrypoint-initdb.d/$file_name \
         https://raw.githubusercontent.com/devrimgunduz/pagila/$PAGILA_TAG/$file_name
 done
 echo ..done
@@ -52,10 +52,10 @@ echo -n Downloading metabase clickhouse driver.
 mkdir -p compose/metabase/plugins/
 METABASE_CLICKHOUSE_DRIVER_TAG=1.50.5
 curl \
-    -s -o compose/metabase/plugins/LICENSE \
+    -s -L -o compose/metabase/plugins/LICENSE \
     https://raw.githubusercontent.com/ClickHouse/metabase-clickhouse-driver/$METABASE_CLICKHOUSE_DRIVER_TAG/LICENSE
 curl \
-    -s -o compose/metabase/plugins/clickhouse.jar \
+    -s -L -o compose/metabase/plugins/clickhouse.jar \
     https://github.com/ClickHouse/metabase-clickhouse-driver/releases/download/$METABASE_CLICKHOUSE_DRIVER_TAG/clickhouse.metabase-driver.jar
 echo ..done
 
