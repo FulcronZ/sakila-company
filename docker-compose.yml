@@ -59,7 +59,9 @@ services:
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
+      - dagster-logs-data:/opt/dagster/logs
       - dagster-history-data:/opt/dagster/history
+      - dagster-schedules-data:/opt/dagster/schedules
       - dagster-storage-data:/opt/dagster/storage
       - bucket-data:/opt/dagster/data
     ports:
@@ -98,7 +100,9 @@ volumes:
   analytics-dwh-data:
   analytics-dwh-logs:
   metabase-db-data:
+  dagster-logs-data:
   dagster-history-data:
+  dagster-schedules-data:
   dagster-storage-data:
 
 secrets:
