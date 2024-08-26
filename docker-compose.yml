@@ -18,8 +18,8 @@ services:
     image: clickhouse/clickhouse-server:24.6
     environment:
       CLICKHOUSE_DB: analytics
-      CLICKHOUSE_USER: admin
-      CLICKHOUSE_PASSWORD: 12345678
+      CLICKHOUSE_USER: $ANALYTICS_DWH_USER
+      CLICKHOUSE_PASSWORD: $ANALYTICS_DWH_PASSWORD
     volumes:
       - ./compose/analytics-dwh/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
       - analytics-dwh-data:/var/lib/clickhouse

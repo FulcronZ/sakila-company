@@ -67,6 +67,9 @@ echo $METABASE_DB_PASSWORD > compose/metabase-db/secrets/db_password.txt
 
 echo -n Generating compose/.env .
 cat > compose/.env <<EOF
+ANALYTICS_DWH_USER=admin
+ANALYTICS_DWH_PASSWORD=$ANALYTICS_DWH_PASSWORD
+
 DAGSTER_DB_USERNAME=postgres
 DAGSTER_DB_PASSWORD=$APP_DB_PASSWORD
 DAGSTER_CLICKHOUSE_USERNAME=admin
