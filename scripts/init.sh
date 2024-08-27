@@ -59,6 +59,12 @@ curl \
     https://github.com/ClickHouse/metabase-clickhouse-driver/releases/download/$METABASE_CLICKHOUSE_DRIVER_TAG/clickhouse.metabase-driver.jar
 echo ..done
 
+echo -n "Provide dagster-db password: "
+read -s DAGSTER_DB_PASSWORD
+echo
+mkdir -p compose/dagster-db/secrets/
+echo $APP_DB_PASSWORD > compose/dagster-db/secrets/db_password.txt
+
 echo -n "Provide metabase-db password: "
 read -s METABASE_DB_PASSWORD
 echo
@@ -70,6 +76,7 @@ cat > compose/.env <<EOF
 ANALYTICS_DWH_USER=admin
 ANALYTICS_DWH_PASSWORD=$ANALYTICS_DWH_PASSWORD
 
+DAGSTER_DB_PASSWORD=$DAGSTER_DB_PASSWORD
 DAGSTER_APP_DB_USERNAME=postgres
 DAGSTER_APP_DB_PASSWORD=$APP_DB_PASSWORD
 DAGSTER_CLICKHOUSE_USERNAME=admin

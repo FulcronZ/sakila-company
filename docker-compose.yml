@@ -28,6 +28,17 @@ services:
       - 18123:8123
       - 19000:9000
 
+  dagster-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD_FILE: /run/secrets/dagster-db-password
+      POSTGRES_DB: dagster
+    volumes:
+      - dagster-db-data:/var/lib/postgresql/data
+    secrets:
+      - dagster-db-password
+
   metabase-db:
     image: postgres:13
     environment:
@@ -69,6 +80,8 @@ services:
     secrets:
       - source: dagster-dbt-profiles
         target: /run/secrets/dbt/profiles.yml
+    depends_on:
+      - dagster-db
 
   metabase:
     image: metabase/metabase:v0.50.21
@@ -99,6 +112,7 @@ volumes:
   app-db-data:
   analytics-dwh-data:
   analytics-dwh-logs:
+  dagster-db-data:
   metabase-db-data:
   dagster-logs-data:
   dagster-history-data:
@@ -108,6 +122,8 @@ volumes:
 secrets:
   app-db-password:
     file: ./compose/app-db/secrets/db_password.txt
+  dagster-db-password:
+    file: ./compose/dagster-db/secrets/db_password.txt
   metabase-db-password:
     file: ./compose/metabase-db/secrets/db_password.txt
   dagster-dbt-profiles:
