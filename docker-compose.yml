@@ -53,6 +53,8 @@ services:
   dagster:
     build: ./sakila_etl
     environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
       DBT_PROFILES_DIR: /run/secrets/dbt
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DRIVERNAME: "postgresql+psycopg2"
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__HOST: app-db
@@ -70,10 +72,8 @@ services:
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
       - dagster-logs-data:/opt/dagster/logs
-      - dagster-history-data:/opt/dagster/history
-      - dagster-schedules-data:/opt/dagster/schedules
-      - dagster-storage-data:/opt/dagster/storage
       - bucket-data:/opt/dagster/data
     ports:
       - 3000:3000
