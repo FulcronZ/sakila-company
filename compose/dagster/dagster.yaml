@@ -1,0 +1,23 @@
+###############################################################################
+# Dagster instance configuration
+# https://docs.dagster.io/deployment/dagster-instance#configuration-reference
+###############################################################################
+storage:
+  postgres:
+    postgres_db:
+      username:
+        env: DAGSTER_DB_USERNAME
+      password:
+        env: DAGSTER_DB_PASSWORD
+      hostname: dagster-db
+      db_name: dagster
+      port: 5432
+
+compute_logs:
+  module: dagster.core.storage.local_compute_log_manager
+  class: LocalComputeLogManager
+  config:
+    base_dir: /opt/dagster/logs
+
+telemetry:
+  enabled: false

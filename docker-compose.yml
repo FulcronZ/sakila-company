@@ -28,6 +28,17 @@ services:
       - 18123:8123
       - 19000:9000
 
+  dagster-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD_FILE: /run/secrets/dagster-db-password
+      POSTGRES_DB: dagster
+    volumes:
+      - dagster-db-data:/var/lib/postgresql/data
+    secrets:
+      - dagster-db-password
+
   metabase-db:
     image: postgres:13
     environment:
@@ -42,13 +53,15 @@ services:
   dagster:
     build: ./sakila_etl
     environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
       DBT_PROFILES_DIR: /run/secrets/dbt
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DRIVERNAME: "postgresql+psycopg2"
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__HOST: app-db
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PORT: 5432
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DATABASE: pagila
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__USERNAME: $DAGSTER_DB_USERNAME
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PASSWORD: $DAGSTER_DB_PASSWORD
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__USERNAME: $DAGSTER_APP_DB_USERNAME
+      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PASSWORD: $DAGSTER_APP_DB_PASSWORD
       ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__HOST: analytics-dwh
       ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__DATABASE: raw_pagila
       ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__USERNAME: $DAGSTER_CLICKHOUSE_USERNAME
@@ -59,16 +72,16 @@ services:
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
       - dagster-logs-data:/opt/dagster/logs
-      - dagster-history-data:/opt/dagster/history
-      - dagster-schedules-data:/opt/dagster/schedules
-      - dagster-storage-data:/opt/dagster/storage
       - bucket-data:/opt/dagster/data
     ports:
       - 3000:3000
     secrets:
       - source: dagster-dbt-profiles
         target: /run/secrets/dbt/profiles.yml
+    depends_on:
+      - dagster-db
 
   metabase:
     image: metabase/metabase:v0.50.21
@@ -99,6 +112,7 @@ volumes:
   app-db-data:
   analytics-dwh-data:
   analytics-dwh-logs:
+  dagster-db-data:
   metabase-db-data:
   dagster-logs-data:
   dagster-history-data:
@@ -108,6 +122,8 @@ volumes:
 secrets:
   app-db-password:
     file: ./compose/app-db/secrets/db_password.txt
+  dagster-db-password:
+    file: ./compose/dagster-db/secrets/db_password.txt
   metabase-db-password:
     file: ./compose/metabase-db/secrets/db_password.txt
   dagster-dbt-profiles:
