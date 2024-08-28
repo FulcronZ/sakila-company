@@ -50,8 +50,57 @@ services:
     secrets:
       - metabase-db-password
 
-  dagster:
-    build: ./sakila_etl
+  dagster-daemon:
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile_base
+    entrypoint: ["dagster-daemon", "run", "-w", "workspace.yaml"]
+    environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
+    volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
+      - ./compose/dagster/workspace.yaml:/opt/dagster/workspace.yaml
+    depends_on:
+      - dagster-db
+
+  dagster-webserver:
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile_base
+    entrypoint:
+      - dagster-webserver
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
+    volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
+      - ./compose/dagster/workspace.yaml:/opt/dagster/workspace.yaml
+    ports:
+      - 3000:3000
+    depends_on:
+      - dagster-db
+
+  dagster-code-sakila_etl:
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile
+    entrypoint:
+      - "dagster"
+      - "api"
+      - "grpc"
+      - "-h"
+      - "0.0.0.0"
+      - "-p"
+      - "4000"
+      - "-m"
+      - "sakila_etl"
     environment:
       DAGSTER_DB_USERNAME: dagster
       DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
@@ -72,16 +121,14 @@ services:
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
-      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
       - dagster-logs-data:/opt/dagster/logs
       - bucket-data:/opt/dagster/data
-    ports:
-      - 3000:3000
     secrets:
       - source: dagster-dbt-profiles
         target: /run/secrets/dbt/profiles.yml
     depends_on:
       - dagster-db
+      - app-db # Required for loading dlt source assets
 
   metabase:
     image: metabase/metabase:v0.50.21
