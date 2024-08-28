@@ -50,8 +50,16 @@ services:
     secrets:
       - metabase-db-password
 
-  dagster:
+  dagster-webserver:
     build: ./sakila_etl
+    entrypoint:
+      - dagster-webserver
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
     environment:
       DAGSTER_DB_USERNAME: dagster
       DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
