@@ -20,6 +20,8 @@ echo $APP_DB_PASSWORD > compose/app-db/secrets/db_password.txt
 echo -n "Provide analytics-dwh password: "
 read -s ANALYTICS_DWH_PASSWORD
 echo
+
+echo -n Generating compose/dagster/secrets/dbt_profiles.yml .
 mkdir -p compose/dagster/secrets/
 cat > compose/dagster/secrets/dbt_profiles.yml <<EOF
 sakila_dwh:
@@ -47,6 +49,29 @@ sakila_dwh:
       # use_lw_deletes: False
       # custom_settings: <empty>
 EOF
+echo ..done
+
+echo -n Generating compose/dagster/secrets/dlt_secrets.toml .
+mkdir -p compose/dagster/secrets/
+cat > compose/dagster/secrets/dlt_secrets.toml <<EOF
+[sources.sql_database.pagila.credentials]
+drivername = "postgresql+psycopg2"
+host = "app-db"
+port = "5432"
+database = "pagila"
+username = "postgres"
+password = "$APP_DB_PASSWORD"
+
+[analytics_dwh__pagila.destination.clickhouse.credentials]
+host = "analytics-dwh"
+database = "raw_pagila"
+username = "admin"
+password = "$ANALYTICS_DWH_PASSWORD"
+port = 9000
+http_port = 8123
+secure = 0
+EOF
+echo ..done
 
 echo -n Downloading metabase clickhouse driver.
 mkdir -p compose/metabase/plugins/

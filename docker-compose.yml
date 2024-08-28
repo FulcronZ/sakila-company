@@ -105,19 +105,7 @@ services:
       DAGSTER_DB_USERNAME: dagster
       DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
       DBT_PROFILES_DIR: /run/secrets/dbt
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DRIVERNAME: "postgresql+psycopg2"
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__HOST: app-db
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PORT: 5432
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DATABASE: pagila
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__USERNAME: $DAGSTER_APP_DB_USERNAME
-      SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__PASSWORD: $DAGSTER_APP_DB_PASSWORD
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__HOST: analytics-dwh
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__DATABASE: raw_pagila
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__USERNAME: $DAGSTER_CLICKHOUSE_USERNAME
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__PASSWORD: $DAGSTER_CLICKHOUSE_PASSWORD
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__PORT: 9000
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__HTTP_PORT: 8123
-      ANALYTICS_DWH__PAGILA__DESTINATION__CLICKHOUSE__CREDENTIALS__SECURE: 0
+      DLT_SECRETS_DIR: /run/secrets/dlt
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
@@ -126,6 +114,8 @@ services:
     secrets:
       - source: dagster-dbt-profiles
         target: /run/secrets/dbt/profiles.yml
+      - source: dagster-dlt-secrets
+        target: /run/secrets/dlt/secrets.toml
     depends_on:
       - dagster-db
       - app-db # Required for loading dlt source assets
@@ -175,3 +165,5 @@ secrets:
     file: ./compose/metabase-db/secrets/db_password.txt
   dagster-dbt-profiles:
     file: ./compose/dagster/secrets/dbt_profiles.yml
+  dagster-dlt-secrets:
+    file: ./compose/dagster/secrets/dlt_secrets.toml
