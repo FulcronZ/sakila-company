@@ -11,12 +11,14 @@ python = ">=3.10,<3.11"
 dagster = "^1.7.16"
 dagster-webserver = "^1.7.16"
 dagster-embedded-elt = "^0.24.0"
-dlt = { extras = ["clickhouse"], version = "^0.5.3" }
-psycopg2-binary = "^2.9.9"
 dagster-dbt = "^0.24.1"
+dagster-postgres = "^0.24.2"
+
+[tool.poetry.group.worker.dependencies]
 dbt-clickhouse = "^1.8.1"
 dbt-core = "^1.8.5"
-dagster-postgres = "^0.24.2"
+dlt = { extras = ["clickhouse"], version = "^0.5.3" }
+psycopg2-binary = "^2.9.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"

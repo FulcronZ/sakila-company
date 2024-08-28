@@ -51,7 +51,9 @@ services:
       - metabase-db-password
 
   dagster-daemon:
-    build: ./sakila_etl
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile_base
     entrypoint: ["dagster-daemon", "run", "-w", "workspace.yaml"]
     environment:
       DAGSTER_DB_USERNAME: dagster
@@ -63,7 +65,9 @@ services:
       - dagster-db
 
   dagster-webserver:
-    build: ./sakila_etl
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile_base
     entrypoint:
       - dagster-webserver
       - -h
@@ -84,7 +88,9 @@ services:
       - dagster-db
 
   dagster-code-sakila_etl:
-    build: ./sakila_etl
+    build:
+      context: ./sakila_etl
+      dockerfile: Dockerfile
     entrypoint:
       - "dagster"
       - "api"
