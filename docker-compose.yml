@@ -50,6 +50,18 @@ services:
     secrets:
       - metabase-db-password
 
+  dagster-daemon:
+    build: ./sakila_etl
+    entrypoint: ["dagster-daemon", "run", "-w", "workspace.yaml"]
+    environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
+    volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
+      - ./compose/dagster/workspace.yaml:/opt/dagster/workspace.yaml
+    depends_on:
+      - dagster-db
+
   dagster-webserver:
     build: ./sakila_etl
     entrypoint:
