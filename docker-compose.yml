@@ -55,6 +55,29 @@ services:
     environment:
       DAGSTER_DB_USERNAME: dagster
       DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
+    volumes:
+      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
+      - ./compose/dagster/workspace.yaml:/opt/dagster/workspace.yaml
+    ports:
+      - 3000:3000
+    depends_on:
+      - dagster-db
+
+  dagster-code-sakila_etl:
+    build: ./sakila_etl
+    entrypoint:
+      - "dagster"
+      - "api"
+      - "grpc"
+      - "-h"
+      - "0.0.0.0"
+      - "-p"
+      - "4000"
+      - "-m"
+      - "sakila_etl"
+    environment:
+      DAGSTER_DB_USERNAME: dagster
+      DAGSTER_DB_PASSWORD: $DAGSTER_DB_PASSWORD
       DBT_PROFILES_DIR: /run/secrets/dbt
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__DRIVERNAME: "postgresql+psycopg2"
       SOURCES__SQL_DATABASE__PAGILA__CREDENTIALS__HOST: app-db
@@ -72,16 +95,14 @@ services:
       DESTINATION__FILESYSTEM__BUCKET_URL: "data/dlt"
       DESTINATION__FILESYSTEM__KWARGS: '{"auto_mkdir": true}'
     volumes:
-      - ./compose/dagster/dagster.yaml:/opt/dagster/dagster.yaml
       - dagster-logs-data:/opt/dagster/logs
       - bucket-data:/opt/dagster/data
-    ports:
-      - 3000:3000
     secrets:
       - source: dagster-dbt-profiles
         target: /run/secrets/dbt/profiles.yml
     depends_on:
       - dagster-db
+      - app-db # Required for loading dlt source assets
 
   metabase:
     image: metabase/metabase:v0.50.21

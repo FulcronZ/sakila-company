@@ -1,0 +1,5 @@
+load_from:
+  - grpc_server:
+      host: dagster-code-sakila_etl
+      port: 4000
+      location_name: sakila_etl
