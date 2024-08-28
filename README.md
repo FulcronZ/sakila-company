@@ -14,14 +14,6 @@ $ docker compose --env-file compose/.env up
 The initialization script downloads required files and generates credential
 and environment files for every component.
 
-### Ports:
-
-- 3000 - Dagster
-- 3100 - Metabase
-- 5432 - App Database (Postgresql)
-- 18123 - Analytics Data Warehouse (Clickhouse HTTP)
-- 19000 - Analytics Data Warehouse (Clickhouse Native)
-
 ## Background
 
 The author had been working as a data engineer and the first data person
@@ -39,6 +31,8 @@ that struggles with its data platform operating cost can use this as a
 reference and adapt to fit its budget and team's knowledge level.
 
 ## Architecture
+
+![Architecture Image](docs/assets/sakila-company-architecture.drawio.png)
 
 This project uses [Pagila][pagila-data], a [Postgresql][postgres] adaptation of
 [MySQL Sakila][sakila-data] database, as application data.
