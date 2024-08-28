@@ -1,9 +1,23 @@
+import os
 from typing import Dict
 import dlt
+from dlt.common.configuration.providers import ProjectDocProvider, SECRETS_TOML
 
 from .connectors.sql_database import sql_database
 from .utils import TableConfig
 
+
+# Add extra secret lookup file if provided
+DLT_SECRETS_DIR = os.getenv("DLT_SECRETS_DIR")
+if DLT_SECRETS_DIR:
+    provider = ProjectDocProvider(
+        name="custom",
+        supports_secrets=True,
+        project_dir=DLT_SECRETS_DIR,
+        file_name=SECRETS_TOML,
+        add_global_config=False,
+    )
+    dlt.secrets.register_provider(provider)
 
 TABLE_CONFIGS: Dict[str, TableConfig] = {
     "actor": {
