@@ -8,6 +8,7 @@ a fictional DVD rental company.
 
 ```sh
 $ ./scripts/init.sh
+$ docker compose --env-file compose/.env build
 $ docker compose --env-file compose/.env up
 ```
 

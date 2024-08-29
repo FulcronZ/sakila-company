@@ -109,4 +109,5 @@ DAGSTER_CLICKHOUSE_PASSWORD=$ANALYTICS_DWH_PASSWORD
 EOF
 echo ..done
 
-echo "Run docker compose --env-file compose/.env up to start the project"
+echo "Run docker compose --env-file compose/.env build"
+echo "and docker compose --env-file compose/.env up to start the project"
