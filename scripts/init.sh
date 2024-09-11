@@ -109,5 +109,13 @@ DAGSTER_CLICKHOUSE_PASSWORD=$ANALYTICS_DWH_PASSWORD
 EOF
 echo ..done
 
-echo "Run docker compose --env-file compose/.env build"
-echo "and docker compose --env-file compose/.env up to start the project"
+echo -n Building docker images.
+docker compose --env-file compose/.env build
+echo ..done
+
+echo "Run the following command to initialize database"
+echo "Then press Ctrl+c when initialization finishes"
+echo "docker compose --env-file compose/.env up app-db analytics-dwh dagster-db metabase-db"
+
+echo "Run the following to start the project after finishing steps above"
+echo "docker compose --env-file compose/.env up"
