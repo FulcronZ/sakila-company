@@ -1,6 +1,12 @@
 .vscode
 
-compose/**/secrets/
+# Service secrets
+compose/app-db/secrets/db_password.txt
+compose/dagster/secrets/dbt_profiles.yml
+compose/dagster/secrets/dlt_secrets.toml
+compose/dagster-db/secrets/db_password.txt
+compose/metabase-db/secrets/db_password.txt
+
 compose/.env*
 compose/**/LICENSE*
 compose/app-db/docker-entrypoint-initdb.d/pagila-*.sql
