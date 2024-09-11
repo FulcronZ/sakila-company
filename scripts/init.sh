@@ -2,7 +2,7 @@
 
 PAGILA_TAG="pagila-v3.1.0"
 echo -n Downloading pagila database.
-mkdir -p compose/app-db/
+mkdir -p compose/app-db/docker-entrypoint-initdb.d/
 for file_name in pagila-schema.sql pagila-data.sql LICENSE.txt
 do
     curl \
