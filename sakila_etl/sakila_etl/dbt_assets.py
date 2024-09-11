@@ -9,9 +9,9 @@ from dagster_dbt import (
     DbtProject,
 )
 
-
+# TODO: Compile dbt project during CD
 dbt_project = DbtProject(project_dir=Path(__file__).parent / "dbt_project")
-dbt_project.prepare_if_dev()
+dbt_project.preparer.prepare(dbt_project)
 
 
 class CustomDagsterDbtTranslator(DagsterDbtTranslator):
